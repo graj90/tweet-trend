@@ -1,4 +1,6 @@
 def registry = 'https://rajg90.jfrog.io'
+def imageName = 'rajg90.jfrog.io//valaxy1-docker-local/ttrend1'
+def version   = '2.1.4'
 
 pipeline {
     agent {
@@ -68,5 +70,27 @@ pipeline {
                 }
             }   
         }
+    
+     stage(" Docker Build ") {
+      steps {
+        script {
+           echo '<--------------- Docker Build Started --------------->'
+           app = docker.build(imageName+":"+version)
+           echo '<--------------- Docker Build Ends --------------->'
+        }
+      }
     }
+
+            stage (" Docker Publish "){
+        steps {
+            script {
+               echo '<--------------- Docker Publish Started --------------->'  
+                docker.withRegistry(registry, 'Artifact-token'){
+                    app.push()
+                }    
+               echo '<--------------- Docker Publish Ended --------------->'  
+            }
+        }
+    }
+  }
 }
